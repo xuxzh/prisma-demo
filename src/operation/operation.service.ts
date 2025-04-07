@@ -12,23 +12,32 @@ export class OperationService {
       createOperationDto.uuid = uuid();
     }
     return this.prisma.operation.create({
-      data:createOperationDto
+      data: createOperationDto,
     });
   }
 
   findAll() {
-    return `This action returns all operation`;
+    return this.prisma.operation.findMany();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} operation`;
+    return this.prisma.operation.findFirstOrThrow({
+      where: {
+        id,
+      },
+    });
   }
 
   update(id: number, updateOperationDto: UpdateOperationDto) {
-    return `This action updates a #${id} operation`;
+    return this.prisma.operation.update({
+      where: { id },
+      data: updateOperationDto,
+    });
   }
 
   remove(id: number) {
-    return `This action removes a #${id} operation`;
+    return this.prisma.operation.delete({
+      where: { id },
+    });
   }
 }
