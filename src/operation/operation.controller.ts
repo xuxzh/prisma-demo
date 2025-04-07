@@ -36,7 +36,7 @@ export class OperationController {
     }
     
     // NestJS 内置的 ip 获取（推荐）
-    return { clientIp: (req as any).socket.remoteAddress };
+    return { clientIp: (req as any).socket.remoteAddress?.split(':').pop() };
   }
 
   @Post()
