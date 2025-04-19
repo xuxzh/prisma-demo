@@ -31,6 +31,13 @@
 $ pnpm install
 ```
 
+## Init prisma
+
+```bash
+# 第一次运行直接拉取远程数据数据
+[npx] prisma db pull
+```
+
 ## Compile and run the project
 
 ```bash
