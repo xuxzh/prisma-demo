@@ -7,68 +7,96 @@ import {
   Param,
   Delete,
   Req,
-  Request
+  Request,
 } from '@nestjs/common';
 import { OperationService } from './operation.service';
 import { CreateOperationDto } from './dto/create-operation.dto';
 import { UpdateOperationDto } from './dto/update-operation.dto';
 import { v4 as uuid } from 'uuid';
-
+import { XzHttpResponse, XzSafeAny } from 'src/model';
+import { XzReponseHelper } from 'src/core';
 
 @Controller('operation')
 export class OperationController {
   constructor(private readonly operationService: OperationService) {}
 
   @Get('getClientIp')
-  getClientIP(@Req() req: Request) {
-    const xForwardedFor = req.headers['x-forwarded-for'];
-    const xRealIp = req.headers['x-real-ip'];
-    
-    if (xForwardedFor) {
-      const ips = Array.isArray(xForwardedFor) 
-        ? xForwardedFor[0] 
-        : xForwardedFor;
-      return { clientIp: ips.split(',')[0].trim() };
+  getClientIP(@Req() req: Request): XzHttpResponse {
+    try {
+      const ip = XzReponseHelper.getClienIp(req);
+      return XzReponseHelper.success({ clientIp: ip });
+    } catch (error: unknown) {
+      return XzReponseHelper.fail(
+        (error as Record<string, XzSafeAny>)?.message || '获取ip失败',
+      );
     }
-    
-    if (xRealIp) {
-      return { clientIp: Array.isArray(xRealIp) ? xRealIp[0] : xRealIp };
-    }
-    
-    // NestJS 内置的 ip 获取（推荐）
-    return { clientIp: (req as any).socket.remoteAddress?.split(':').pop() };
   }
 
   @Post()
-  create(@Req() req: Request,@Body() createOperationDto: CreateOperationDto) {
-    const ip = this.getClientIP(req).clientIp;
-    if(!createOperationDto.uuid?.trim()){
-      createOperationDto.uuid=uuid();
+  async create(
+    @Req() req: Request,
+    @Body() createOperationDto: CreateOperationDto,
+  ) {
+    try {
+      const ip = XzReponseHelper.getClienIp(req);
+      if (!createOperationDto.uuid?.trim()) {
+        createOperationDto.uuid = uuid();
+      }
+      createOperationDto.ip = ip;
+      return await this.operationService.create(createOperationDto);
+    } catch (error: unknown) {
+      return XzReponseHelper.fail(
+        ((error as Record<string, XzSafeAny>)?.message as string) || '创建失败',
+      );
     }
-    createOperationDto.ip=ip;
-    return this.operationService.create(createOperationDto);
   }
 
   @Get()
-  findAll() {
-    return this.operationService.findAll();
+  async findAll() {
+    try {
+      return await this.operationService.findAll();
+    } catch (error: unknown) {
+      return XzReponseHelper.fail(
+        ((error as Record<string, XzSafeAny>)?.message as string) ||
+          '获取列表失败',
+      );
+    }
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.operationService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    try {
+      return await this.operationService.findOne(+id);
+    } catch (error: unknown) {
+      return XzReponseHelper.fail(
+        ((error as Record<string, XzSafeAny>)?.message as string) ||
+          '获取详情失败',
+      );
+    }
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateOperationDto: UpdateOperationDto,
   ) {
-    return this.operationService.update(+id, updateOperationDto);
+    try {
+      return await this.operationService.update(+id, updateOperationDto);
+    } catch (error: unknown) {
+      return XzReponseHelper.fail(
+        ((error as Record<string, XzSafeAny>)?.message as string) || '更新失败',
+      );
+    }
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.operationService.remove(+id);
+  async remove(@Param('id') id: string) {
+    try {
+      return await this.operationService.remove(+id);
+    } catch (error: unknown) {
+      return XzReponseHelper.fail(
+        ((error as Record<string, XzSafeAny>)?.message as string) || '删除失败',
+      );
+    }
   }
 }
