@@ -10,10 +10,10 @@ datasource db {
 model Operation {
   ip          String
   companyCode String
-  companyDate String?
-  user   String?
-  customer    String?
+  user        String?
   customerId  String?
+  companyDate String?
+  customer    String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   uuid        String   @unique

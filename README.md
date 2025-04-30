@@ -35,6 +35,7 @@ $ pnpm install
 
 ```bash
 # 第一次运行直接拉取远程数据数据
+[npx] prisma generate
 [npx] prisma db pull
 ```
 
