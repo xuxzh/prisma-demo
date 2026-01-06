@@ -31,6 +31,14 @@
 $ pnpm install
 ```
 
+## Set up the environment variables
+
+```bash
+# 复制 .env.example 文件到 .env 文件
+$ cp .env.example .env
+# 然后在 .env 文件中填写实际数据库连接信息
+```
+
 ## Init prisma
 
 ```bash
